@@ -62,7 +62,7 @@ class TransaksiController extends Controller
         if($request->jenis_zakat == 'beras'){
             $total_zakat = $request->total_zakat . ' Kg';
         }else{
-            $total_zakat = number_format($request->total_zakat,2);
+            $total_zakat = 'Rp. ' . number_format($request->total_zakat,2);
         }
 
         $message_wa = "*Zakat Berhasil Diterima Lazisnu* \n\n*Nama*   : {$request->nama} \n*Alamat* : {$request->alamat}\n\n";
@@ -72,7 +72,7 @@ class TransaksiController extends Controller
             $muzakinya = $request[$muzaki];
             $message_wa .= "*Nama* : {$muzakinya} \n";
         }
-        $message_wa .= "\nTotal Zakat = *Rp. {$total_zakat}*";
+        $message_wa .= "\nTotal Zakat = * {$total_zakat}*";
         
           
         $jsonData = [
@@ -91,6 +91,7 @@ class TransaksiController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Zakat berhasil disimpan',
+            'print_text' => $message_wa,
         ]);
 
 
