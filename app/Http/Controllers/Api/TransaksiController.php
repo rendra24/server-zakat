@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Transaksi;
-use App\Models\TransaksiDetail;
 use Illuminate\Http\Request;
+use App\Models\TransaksiDetail;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
 
 class TransaksiController extends Controller
 {
@@ -47,6 +49,44 @@ class TransaksiController extends Controller
             ];
             TransaksiDetail::create($detailTransaksi);
         }
+        $nohp = $request->telp;
+        if(!preg_match("/[^+0-9]/",trim($nohp))){
+            if(substr(trim($nohp), 0, 2)=="62"){
+                $hp    =trim($nohp);
+            }
+            else if(substr(trim($nohp), 0, 1)=="0"){
+                $hp    ="62".substr(trim($nohp), 1);
+            }
+        }
+
+        if($request->jenis_zakat == 'beras'){
+            $total_zakat = $request->total_zakat . ' Kg';
+        }else{
+            $total_zakat = number_format($request->total_zakat,2);
+        }
+
+        $message_wa = "*Zakat Berhasil Diterima Lazisnu* \n\n*Nama*   : {$request->nama} \n*Alamat* : {$request->alamat}\n\n";
+        $message_wa .= "*List Muzaki* \n";
+        for ($i=1; $i <= $total_muzaki; $i++) { 
+            $muzaki = 'muzaki' . $i;
+            $muzakinya = $request[$muzaki];
+            $message_wa .= "*Nama* : {$muzakinya} \n";
+        }
+        $message_wa .= "\nTotal Zakat = *Rp. {$total_zakat}*";
+        
+          
+        $jsonData = [
+            'jid' => $hp.'@s.whatsapp.net',
+            'type' => 'number',
+            'message' => ['text' => $message_wa]
+        ]; 
+
+
+        $response = Http::withBody(
+                    json_encode($jsonData), 'application/json'
+                )->post('http://188.166.204.127/colabs/messages/send');
+
+        Log::debug($response);
 
         return response()->json([
             'status' => true,
