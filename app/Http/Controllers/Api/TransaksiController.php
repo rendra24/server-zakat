@@ -72,7 +72,7 @@ class TransaksiController extends Controller
             $muzakinya = $request[$muzaki];
             $message_wa .= "*Nama* : {$muzakinya} \n";
         }
-        $message_wa .= "\nTotal Zakat = * {$total_zakat}*";
+        $message_wa .= "\nTotal Zakat = *{$total_zakat}*";
         
           
         $jsonData = [
